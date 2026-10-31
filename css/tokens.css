@@ -1,0 +1,22 @@
+/* ========================================================================
+   DESIGN TOKENS  (tokens.css)
+   Brand colours (navy, red), fonts and sizes used across the site. Change the brand colours HERE first.
+   Loaded first on every page.
+   Edit with care: later stylesheets can override earlier ones (see the STYLESHEETS banner in each page).
+   ======================================================================== */
+
+:root{
+      --navy:#062650;
+      --navy-2:#0b376d;
+      --red:#e80000;
+      --sky:#a9c8df;
+      --ice:#eef6fb;
+      --mist:#f7fbfe;
+      --ink:#0b1d33;
+      --muted:#5d7188;
+      --line:#dbe8f2;
+      --white:#fff;
+      --shadow:0 20px 60px rgba(6,38,80,.12);
+      --radius:24px;
+      --max:1240px;
+    }
