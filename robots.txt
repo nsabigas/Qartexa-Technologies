@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /portal.html
+Disallow: /admin.html
+
+Sitemap: https://www.qartexa.com/sitemap.xml

@@ -1,0 +1,34 @@
+QARTEXA WEBSITE - COMPLETE PACKAGE
+==================================
+
+This one ZIP contains everything: the website, the Staff Portal, the database
+files and all guides. Nothing else is needed.
+
+HOW TO PUBLISH THE WEBSITE (any host)
+1. Extract the ZIP. Open the extracted folder: you should see index.html,
+   a "css" folder, a "js" folder, an "img" folder and many pictures.
+2. Upload EVERYTHING inside that folder to your web host's public folder
+   (the folder that must contain index.html at its top level).
+   Hosts that take a whole folder or ZIP in one go (Cloudflare Pages "Direct
+   Upload", Netlify "Drop", cPanel File Manager, FTP) are the easiest.
+   GitHub's website uploader accepts only 100 files per upload (this site has
+   more), so with GitHub use "GitHub Desktop" or the command line instead.
+3. Open  yourdomain/deploy-check.html  . It checks every file and tells you
+   in green or red whether anything is missing.
+4. Press Ctrl+F5 on the home page.
+
+You may delete these folders before publishing; the website does not need them:
+   docs, tests, tools, supabase   (keep them in your own archive: they hold the
+   guides, database setup files and tests).
+
+STAFF PORTAL (editing, Media library, forms, jobs)
+Needs a Supabase project. Follow docs/V5-SETUP-GUIDE.md (and docs/V4-SETUP-GUIDE.md).
+Without Supabase the public pages still work and look the same.
+
+GUIDES (in the "docs" folder)
+   V5-SETUP-GUIDE.md ........ Media library and hero images
+   V4-SETUP-GUIDE.md ........ roles, forms, e-mail, social media
+   ADMIN-GUIDE.md ........... how to use the Staff Portal (with screenshots)
+   DEPLOY-GITHUB-PAGES.md ... publishing notes
+   BACKUP-AND-RECOVERY.md, STORAGE-AND-COSTS.md, SECURITY-CHECKLIST.md,
+   TEST-REPORT-V5.md, AUDIT-AND-FEATURE-INVENTORY.md, IMAGE-INVENTORY.md
