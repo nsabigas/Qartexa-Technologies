@@ -1,0 +1,35 @@
+/* QARTEXA V3: Studio editor styles (css/qx-studio.css). Loaded only for signed-in staff. */
+.qs-ui,.qs-ui *{font-family:Arial,Helvetica,"Liberation Sans",sans-serif;box-sizing:border-box}
+.qs-ui:not(.qs-pop){position:fixed;left:14px;bottom:14px;z-index:99990;display:flex;gap:6px;padding:6px;border-radius:14px;background:#062650;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.qs-ui>button,.qs-ui>a{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border:0;border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:14px;line-height:1;text-decoration:none;cursor:pointer}
+.qs-ui>button:hover,.qs-ui>a:hover{background:rgba(255,255,255,.22)}
+.qs-ui>.qs-main{background:#e80000}.qs-ui>.qs-main:hover{background:#c40000}
+.qs-ui>button:focus-visible,.qs-ui>a:focus-visible{outline:3px solid #fff;outline-offset:2px}
+html.qx-editing [data-cms]:hover,html.qx-editing [data-cms-link]:hover,html.qx-editing [data-cms-img]:hover,html.qx-editing [data-cms-bg]:hover{outline:2px dashed #e80000!important;outline-offset:3px;cursor:pointer}
+html.qx-editing [data-cms],html.qx-editing [data-cms-img]{cursor:pointer}
+html.qx-editing .hero-visual{pointer-events:auto}
+html.qx-editing .qx-edited{box-shadow:0 0 0 2px rgba(0,120,255,.35)}
+.qs-pop{position:fixed;z-index:99995;max-height:calc(100vh - 16px);overflow:auto;padding:18px;border-radius:14px;background:#fff;color:#0b1d33;box-shadow:0 18px 60px rgba(0,0,0,.4);border:1px solid #dbe8f2}
+.qs-pop h4{margin:0 0 12px;font-size:17px;color:#062650}
+.qs-pop label{display:grid;gap:5px;margin:0 0 12px;font-size:13px;font-weight:700;color:#33506b}
+.qs-pop input[type=text],.qs-pop textarea{width:100%;padding:10px 12px;border:1px solid #c4d6e5;border-radius:9px;font-weight:500;font-size:15px;line-height:1.4;color:#0b1d33;background:#fff}
+.qs-pop textarea{resize:vertical}
+.qs-pop input[type=range]{width:100%}
+.qs-pop .qs-check{display:flex;gap:8px;align-items:center;font-weight:600}
+.qs-pop .qs-hint{margin:0 0 12px;font-size:13px;color:#5d7188;line-height:1.5}
+.qs-pop .qs-more{margin:0 0 12px;padding:10px 12px;border:1px solid #e1ecf5;border-radius:10px;background:#f7fafd}
+.qs-pop .qs-more summary{cursor:pointer;font-weight:700;font-size:13px;color:#33506b}
+.qs-pop .qs-link{margin:4px 0 0;padding:0;border:0;background:none;color:#c40000;font-weight:700;font-size:13px;line-height:1;cursor:pointer;text-align:left}
+.qs-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.qs-actions button{padding:10px 14px;border:1px solid #c4d6e5;border-radius:9px;background:#fff;color:#062650;font-weight:700;font-size:14px;line-height:1;cursor:pointer}
+.qs-actions .qs-primary{background:#e80000;border-color:#e80000;color:#fff}
+.qs-actions button:focus-visible,.qs-pop input:focus-visible,.qs-pop textarea:focus-visible{outline:3px solid #062650;outline-offset:2px}
+.qs-msg{margin-top:10px;font-size:13px;color:#a30000;font-weight:600;min-height:1em}
+.qs-prev{height:150px;margin:0 0 12px;border-radius:10px;border:1px solid #dbe8f2;background:#eef3f8 center/contain no-repeat}
+.qs-btnlike{display:inline-flex;align-items:center;justify-content:center;padding:11px 14px;border:1px dashed #9fc0da;border-radius:9px;background:#f3f8fc;color:#062650;font-weight:700;font-size:14px;line-height:1;cursor:pointer}
+.qs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.qs-thumb{height:80px;border:1px solid #dbe8f2;border-radius:9px;background:#eef3f8 center/cover no-repeat;cursor:pointer}
+.qs-thumb:hover{outline:3px solid #e80000}
+.qs-toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);padding:10px 18px;border-radius:10px;background:#062650;color:#fff;font:600 14px/1.3 Arial,sans-serif;z-index:99999;opacity:0;pointer-events:none;transition:opacity .2s}
+.qs-toast.show{opacity:1}
+@media(max-width:700px){.qs-ui .qs-lbl{display:none}.qs-ui:not(.qs-pop){left:8px;bottom:8px}.qs-ui>.qs-main .qs-lbl{display:inline}.qs-pop{left:8px!important;right:8px;width:auto!important;top:auto!important;bottom:8px;max-height:70vh}}

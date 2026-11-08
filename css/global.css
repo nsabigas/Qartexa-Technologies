@@ -1,0 +1,24 @@
+/* ========================================================================
+   GLOBAL BASE STYLES  (global.css)
+   Base look of the whole site: body text, links, images and keyboard focus outline.
+   Loaded on every page, after tokens.css.
+   Edit with care: later stylesheets can override earlier ones (see the STYLESHEETS banner in each page).
+   ======================================================================== */
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{margin:0;color:var(--ink);font-family:Inter,system-ui,sans-serif;background:#fff;line-height:1.6}
+
+a{color:inherit;text-decoration:none}
+
+img{max-width:100%;display:block}
+
+/* Shared foundation: accessible defaults and brand-aligned global polish. */
+:focus-visible{outline:3px solid #e80000;outline-offset:3px}
+html{scroll-padding-top:96px}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+img{height:auto}
+.skip-link{position:fixed;z-index:1000;left:16px;top:12px;padding:10px 14px;background:#062650;color:#fff;border-radius:4px;transform:translateY(-160%)}
+.skip-link:focus{transform:translateY(0)}
