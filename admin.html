@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- ========================================================================
+     QARTEXA TECHNOLOGIES: FILE GUIDE (version 2)
+     Page : Staff dashboard
+     File : admin.html
+     About: Manage solutions, jobs, applications, blog posts and tenders.
+            Only signed-in administrators can use it; others are sent to portal.html.
+     Structure: top bar, left menu, main area (filled by js/qx-admin.js), dialog, message bar.
+     ======================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Staff dashboard | Qartexa Technologies</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/qx.css">
+<link rel="stylesheet" href="css/qx-admin.css">
+</head>
+<body class="qa">
+<!-- ~~~~ Top bar ~~~~ -->
+<header class="qa-top"><a href="index.html" aria-label="Qartexa Technologies home"><img src="qartexa-logo.png" alt="Qartexa Technologies" width="102" height="34"></a><span class="qa-title">Staff portal</span><div class="qa-right"><span id="qa-user"></span><a href="index.html" target="_blank" rel="noopener">View website</a><button type="button" id="qa-signout">Sign out</button></div></header>
+<div class="qa-layout">
+<!-- ~~~~ Left menu ~~~~ -->
+<nav class="qa-nav" id="qa-nav" aria-label="Staff portal sections"></nav>
+<!-- ~~~~ Main area (filled by js/qx-admin.js) ~~~~ -->
+<main class="qa-main" id="qa-main" tabindex="-1"><p class="qa-loading">Loading…</p></main>
+</div>
+<!-- ~~~~ Dialog and message bar ~~~~ -->
+<div class="qa-modal" id="qa-modal" hidden></div>
+<div class="qa-toast" id="qa-toast" role="status" aria-live="polite"></div>
+<script src="js/qx-config.js"></script><script src="js/qx-theme.js"></script>
+<script src="js/qx-core.js"></script>
+<script src="js/qx-icons.js"></script>
+<script src="js/qx-inventory.js"></script>
+<script src="js/qx-hero.js"></script>
+<script src="js/qx-media.js"></script>
+<script src="js/qx-admin3.js"></script>
+<script src="js/qx-admin2.js"></script>
+<script src="js/qx-admin.js"></script>
+</body>
+</html>
