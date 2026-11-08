@@ -8,7 +8,7 @@
    Never paste the "service_role" key here.
    ======================================================================== */
 window.QX_CONFIG = {
-  supabaseUrl: '',        // e.g. 'https://abcdxyz.supabase.co'
-  supabaseAnonKey: '',    // e.g. 'eyJhbGciOi...'
-  demo: false             // true = try everything with sample data saved in your own browser only
+  supabaseUrl: 'https://abophgeersgkjtchtlxw.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFib3BoZ2VlcnNna2p0Y2h0bHh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNTMyMjcsImV4cCI6MjEwOTcyOTIyN30.71QxAFyj0q4GSS3rdOQHWodMDgOVLMbfa90npVux9vE',
+  demo: false
 };
