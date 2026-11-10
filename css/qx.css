@@ -111,3 +111,11 @@
 @media(max-width:960px){.qx-detail{grid-template-columns:1fr;gap:28px}.qx-aside{position:static}.qx-card.feature{flex-direction:column}.qx-card.feature .qx-cover{width:100%;min-height:0;aspect-ratio:16/9}}
 @media(max-width:620px){.qx-row{grid-template-columns:1fr}.qx-row .qx-side{align-items:flex-start;text-align:left;flex-direction:row;flex-wrap:wrap}.qx-form{padding:20px}.qx-form .grid2{grid-template-columns:1fr}.qx-section{padding:32px 0 56px}.qx-toolbar select{flex:1 1 100%}}
 @media(prefers-reduced-motion:reduce){.qx-card,.qx-row,.qx-btn{transition:none}.qx-card:hover,.qx-row:hover,.qx-btn:hover{transform:none}}
+/* Fix button text visibility inside empty sections */
+.qx-empty a.qx-btn {
+    color: #ffffff !important;
+}
+
+.qx-empty a.qx-btn:hover {
+    color: #ffffff !important;
+}
