@@ -119,3 +119,7 @@
 .qx-empty a.qx-btn:hover {
     color: #ffffff !important;
 }
+/* Hide the general social media handle in the footer */
+.social-handle {
+    display: none !important;
+}
