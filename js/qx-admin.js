@@ -65,8 +65,9 @@ function buildNav(){
   $('#qa-nav').innerHTML=NAV_GROUPS.map(g=>{
     const links=g.links.filter(n=>allowed(n[0])),extra=(g.extra||[]).filter(n=>allowed(n[0]));
     if(!links.length&&!extra.length)return '';
-    const compact=window.matchMedia('(max-width:900px)').matches;
-    const groupOpen=!compact||links.concat(extra).some(n=>n[0]===current);
+    // Keep admin navigation groups collapsed initially and after each page selection.
+    // Users can open only the section they need; go() rebuilds the menu after navigation.
+    const groupOpen=false;
     return '<details class="qa-nav-section"'+(groupOpen?' open':'')+'>'+(g.title?'<summary class="qa-nav-h">'+E(g.title)+'<span class="chev" aria-hidden="true"></span></summary>':'')+
       '<div class="qa-nav-section-links">'+links.map(button).join('')+
       (extra.length?'<details class="qa-nav-more"'+(extra.some(n=>n[0]===current)?' open':'')+'><summary>'+E(g.more||'More')+'<span class="chev" aria-hidden="true"></span></summary><div class="qa-nav-sub">'+extra.map(button).join('')+'</div></details>':'')+
