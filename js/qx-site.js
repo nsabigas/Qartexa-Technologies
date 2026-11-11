@@ -139,9 +139,54 @@ async function applyPartners(){
     });
   }catch(e){/* Keep the existing static partner presentation if data cannot be read. */}
 }
+function updateFooterNavigation(){
+  const footer=document.querySelector('footer');
+  if(!footer)return;
+  const grid=footer.querySelector('.footer-grid');
+  if(grid){
+    const columns=[...grid.children];
+    const industries=columns.find(col=>{const h=col.querySelector('h4');return h&&h.textContent.trim().toLowerCase()==='industries';});
+    if(industries){
+      industries.innerHTML='<h4 data-en="Resources" data-fr="Ressources">Resources</h4>'+
+        '<a href="careers.html" data-en="Careers" data-fr="Carrières">Careers</a>'+
+        '<a href="blog.html" data-en="Blog" data-fr="Blog">Blog</a>'+
+        '<a href="tenders.html" data-en="Tenders" data-fr="Appels d’offres">Tenders</a>'+
+        '<a href="privacy.html" data-en="Privacy Policy" data-fr="Politique de confidentialité">Privacy Policy</a>'+
+        '<a href="terms.html" data-en="Terms of Use" data-fr="Conditions d’utilisation">Terms of Use</a>'+
+        '<a href="cookies.html" data-en="Cookie Preferences" data-fr="Préférences en matière de cookies">Cookie Preferences</a>';
+      industries.setAttribute('data-qx-footer-resources','true');
+    }
+  }
+  const bottom=footer.querySelector('.copyright');
+  if(bottom){
+    const resources=bottom.querySelector('.footer-resources');if(resources)resources.remove();
+    const legal=bottom.querySelector('.legal-links');
+    if(legal){
+      const staff=legal.querySelector('a[href="portal.html"]');
+      legal.innerHTML='';
+      if(staff)legal.appendChild(staff);
+      legal.setAttribute('aria-label','Staff');
+    }
+  }
+}
+function addStaffPortalIcon(){
+  document.querySelectorAll('a.qx-portal-link').forEach(link=>{
+    if(link.querySelector('.qx-staff-icon'))return;
+    const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    icon.setAttribute('class','qx-staff-icon');
+    icon.setAttribute('viewBox','0 0 24 24');
+    icon.setAttribute('width','16');icon.setAttribute('height','16');
+    icon.setAttribute('aria-hidden','true');icon.setAttribute('focusable','false');
+    icon.innerHTML='<circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.5-3.4 3.1-5.5 7-5.5s6.5 2.1 7 5.5"></path>';
+    icon.style.cssText='display:inline-block;vertical-align:-3px;margin-right:6px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round';
+    link.prepend(icon);
+  });
+}
 function init(){
   QX.publicRows('solutions').then(applySolutions).catch(()=>{});
   applyPartners();
+  updateFooterNavigation();
+  addStaffPortalIcon();
   homeBand().catch(()=>{});
   U.onLang(rerender);
 }
