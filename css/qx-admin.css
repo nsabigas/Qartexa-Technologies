@@ -102,6 +102,14 @@ body.qa,body.qa *{font-family:Arial,Helvetica,"Liberation Sans",sans-serif}
 .qa-nav-sub button{font-size:14px;padding:10px 12px;font-weight:500}
 .qa-nav-sub button:hover{background:#f1f7fb}
 .qa-nav-sub button[aria-current=page]{background:var(--navy);color:#fff}
+/* Make the current page clearly identifiable in the admin navigation. */
+.qa-nav-section-links>button[aria-current=page],
+.qa-nav-sub button[aria-current=page]{
+  background:#fff0f0;
+  color:#a51f2b;
+  box-shadow:inset 3px 0 0 #c62828;
+  font-weight:700;
+}
 @media(max-width:900px){
  .qa-nav-section{flex:0 0 auto;min-width:max-content}
  .qa-nav-section .qa-nav-h{display:none}
