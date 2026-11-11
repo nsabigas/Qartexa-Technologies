@@ -59,14 +59,16 @@ function buildNav(){
   $('#qa-nav').innerHTML=NAV_GROUPS.map(g=>{
     const links=g.links.filter(n=>allowed(n[0])),extra=(g.extra||[]).filter(n=>allowed(n[0]));
     if(!links.length&&!extra.length)return '';
-    return '<section class="qa-nav-section">'+(g.title?'<div class="qa-nav-h">'+E(g.title)+'</div>':'')+
-      links.map(button).join('')+
+    const compact=window.matchMedia('(max-width:900px)').matches;
+    const groupOpen=!compact||links.concat(extra).some(n=>n[0]===current);
+    return '<details class="qa-nav-section"'+(groupOpen?' open':'')+'>'+(g.title?'<summary class="qa-nav-h">'+E(g.title)+'<span aria-hidden="true">⌄</span></summary>':'')+
+      '<div class="qa-nav-section-links">'+links.map(button).join('')+
       (extra.length?'<details class="qa-nav-more"'+(extra.some(n=>n[0]===current)?' open':'')+'><summary>'+E(g.more||'More')+'<span aria-hidden="true">⌄</span></summary><div class="qa-nav-sub">'+extra.map(button).join('')+'</div></details>':'')+
-      '</section>';
+      '</div></details>';
   }).join('');
   $('#qa-nav').querySelectorAll('button[data-s]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
 }
-function go(s){current=s;history.replaceState(null,'','#'+s);buildNav();if(!allowed(s)){s=current='overview';}({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)))();main.focus&&main.focus();}
+function go(s){current=s;document.body.classList.remove('qa-nav-open');history.replaceState(null,'','#'+s);buildNav();if(!allowed(s)){s=current='overview';}({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)))();main.focus&&main.focus();}
 async function counts(){
   const q=async(t,w)=>{try{return (await S.list(t,{where:w})).length;}catch(e){return 0;}};
   const [a,b,c,d]=await Promise.all([q('applications',{status:'new'}),q('jobs',{status:'open'}),q('posts',{status:'published'}),q('tenders',{status:'open'})]);
@@ -274,6 +276,11 @@ if(window.QXA_EXT3)window.QXA_EXT3(window.QXA);
   try{await S.rpc('expire_items');}catch(e){}   /* tidy: marks expired jobs/tenders as closed */
   const s=QX.auth.session();$('#qa-user').textContent=(s.user&&s.user.email)||'';
   $('#qa-signout').addEventListener('click',signOut);
+  const navToggle=$('#qa-nav-toggle');
+  if(navToggle)navToggle.addEventListener('click',()=>{const open=document.body.classList.toggle('qa-nav-open');navToggle.setAttribute('aria-expanded',String(open));});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('qa-nav-open');if(navToggle)navToggle.setAttribute('aria-expanded','false');}});
+  const mq=window.matchMedia('(max-width:900px)');
+  if(mq.addEventListener)mq.addEventListener('change',()=>{document.body.classList.remove('qa-nav-open');buildNav();});
   const h=location.hash.replace('#','');current=NAV.some(n=>n[0]===h&&n[0]!=='--'&&allowed(n[0]))?h:'overview';
   $('#qa-user').textContent=((s.user&&s.user.email)||'')+' · '+({super_admin:'Super Administrator',admin:'Administrator',editor:'Website Editor',hr:'HR Manager',content:'Content Manager'}[ROLE]||ROLE);
   buildNav();go(current);
