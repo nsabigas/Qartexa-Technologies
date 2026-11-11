@@ -145,29 +145,31 @@ function updateFooterNavigation(){
   const grid=footer.querySelector('.footer-grid');
   if(grid){
     const columns=[...grid.children];
-    const industries=columns.find(col=>{const h=col.querySelector('h4');return h&&h.textContent.trim().toLowerCase()==='industries';});
-    if(industries){
-      industries.innerHTML='<h4 data-en="Resources" data-fr="Ressources">Resources</h4>'+
+    const resources=columns.find(col=>{const h=col.querySelector('h4');return h&&(h.textContent.trim().toLowerCase()==='industries'||h.textContent.trim().toLowerCase()==='resources'||h.hasAttribute('data-qx-footer-resources'));});
+    if(resources){
+      resources.setAttribute('data-qx-footer-resources','true');
+      resources.innerHTML='<h4 data-en="Resources" data-fr="Ressources">Resources</h4>'+
         '<a href="careers.html" data-en="Careers" data-fr="Carrières">Careers</a>'+
         '<a href="blog.html" data-en="Blog" data-fr="Blog">Blog</a>'+
         '<a href="tenders.html" data-en="Tenders" data-fr="Appels d’offres">Tenders</a>'+
         '<a href="privacy.html" data-en="Privacy Policy" data-fr="Politique de confidentialité">Privacy Policy</a>'+
         '<a href="terms.html" data-en="Terms of Use" data-fr="Conditions d’utilisation">Terms of Use</a>'+
         '<a href="cookies.html" data-en="Cookie Preferences" data-fr="Préférences en matière de cookies">Cookie Preferences</a>';
-      industries.setAttribute('data-qx-footer-resources','true');
     }
   }
   const bottom=footer.querySelector('.copyright');
   if(bottom){
     const resources=bottom.querySelector('.footer-resources');if(resources)resources.remove();
-    const legal=bottom.querySelector('.legal-links');
-    if(legal){
-      const staff=legal.querySelector('a[href="portal.html"]');
-      legal.innerHTML='';
-      if(staff)legal.appendChild(staff);
-      legal.setAttribute('aria-label','Staff');
-    }
+    const legal=bottom.querySelector('.legal-links');if(legal)legal.remove();
   }
+  translateFooterResources();
+}
+function translateFooterResources(){
+  const fr=U.lang()==='fr';
+  document.querySelectorAll('[data-qx-footer-resources] [data-en][data-fr]').forEach(el=>{
+    const value=fr?el.getAttribute('data-fr'):el.getAttribute('data-en');
+    if(value!==null)el.textContent=value;
+  });
 }
 function addStaffPortalIcon(){
   document.querySelectorAll('a.qx-portal-link').forEach(link=>{
@@ -193,6 +195,7 @@ function init(){
   addStaffPortalIcon();
   homeBand().catch(()=>{});
   U.onLang(rerender);
+  U.onLang(translateFooterResources);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
