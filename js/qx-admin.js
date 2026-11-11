@@ -68,7 +68,7 @@ function buildNav(){
   }).join('');
   $('#qa-nav').querySelectorAll('button[data-s]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
 }
-function go(s){current=s;document.body.classList.remove('qa-nav-open');history.replaceState(null,'','#'+s);buildNav();if(!allowed(s)){s=current='overview';}({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)))();main.focus&&main.focus();}
+function go(s){current=s;window.scrollTo({top:0,left:0,behavior:'auto'});main.scrollTop=0;document.documentElement.scrollTop=0;document.body.classList.remove('qa-nav-open');history.replaceState(null,'','#'+s);buildNav();if(!allowed(s)){s=current='overview';}({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)))();main.focus&&main.focus();}
 async function counts(){
   const q=async(t,w)=>{try{return (await S.list(t,{where:w})).length;}catch(e){return 0;}};
   const [a,b,c,d]=await Promise.all([q('applications',{status:'new'}),q('jobs',{status:'open'}),q('posts',{status:'published'}),q('tenders',{status:'open'})]);
@@ -274,7 +274,21 @@ if(window.QXA_EXT3)window.QXA_EXT3(window.QXA);
 (async function(){
   ROLE=QX.auth.session()?await QX.auth.role():null;if(!ROLE){location.replace('portal.html');return;}
   try{await S.rpc('expire_items');}catch(e){}   /* tidy: marks expired jobs/tenders as closed */
-  const s=QX.auth.session();$('#qa-user').textContent=(s.user&&s.user.email)||'';
+  const s=QX.auth.session();
+  const user=s&&s.user?s.user:{},meta=user.user_metadata||{};
+  const displayName=meta.full_name||meta.name||meta.display_name||user.email||'My profile';
+  const avatar=meta.avatar_url||meta.picture||meta.photo_url||'';
+  const profile=$('#qa-profile');
+  if(profile){
+    const pic=avatar?'<img src="'+E(avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="qa-profile-fallback" aria-hidden="true">♙</span>';
+    profile.innerHTML='<button type="button" class="qa-profile-trigger" id="qa-profile-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="qa-profile-menu">'+pic+'<span class="qa-profile-name">'+E(displayName)+'</span><span aria-hidden="true">⌄</span></button><div class="qa-profile-menu" id="qa-profile-menu" hidden><div class="qa-profile-identity">'+(avatar?'<img src="'+E(avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="qa-profile-large">♙</span>')+'<div><strong>'+E(displayName)+'</strong><span>'+E(user.email||'')+'</span></div></div><button type="button" data-profile="account">Profile & account settings</button><button type="button" data-profile="logout">Sign out</button></div>';
+    const trigger=$('#qa-profile-trigger'),menu=$('#qa-profile-menu');
+    trigger.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;trigger.setAttribute('aria-expanded',String(open));});
+    profile.querySelector('[data-profile="account"]').addEventListener('click',()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');go('account');});
+    profile.querySelector('[data-profile="logout"]').addEventListener('click',signOut);
+    document.addEventListener('click',e=>{if(!profile.contains(e.target)){menu.hidden=true;trigger.setAttribute('aria-expanded','false');}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.hidden=true;trigger.setAttribute('aria-expanded','false');}});
+  }
   $('#qa-signout').addEventListener('click',signOut);
   const navToggle=$('#qa-nav-toggle');
   if(navToggle)navToggle.addEventListener('click',()=>{const open=document.body.classList.toggle('qa-nav-open');navToggle.setAttribute('aria-expanded',String(open));});
@@ -282,7 +296,7 @@ if(window.QXA_EXT3)window.QXA_EXT3(window.QXA);
   const mq=window.matchMedia('(max-width:900px)');
   if(mq.addEventListener)mq.addEventListener('change',()=>{document.body.classList.remove('qa-nav-open');buildNav();});
   const h=location.hash.replace('#','');current=NAV.some(n=>n[0]===h&&n[0]!=='--'&&allowed(n[0]))?h:'overview';
-  $('#qa-user').textContent=((s.user&&s.user.email)||'')+' · '+({super_admin:'Super Administrator',admin:'Administrator',editor:'Website Editor',hr:'HR Manager',content:'Content Manager'}[ROLE]||ROLE);
+  const roleLabel=({super_admin:'Super Administrator',admin:'Administrator',editor:'Website Editor',hr:'HR Manager',content:'Content Manager'}[ROLE]||ROLE);if(profile)profile.setAttribute('aria-label',displayName+' — '+roleLabel);
   buildNav();go(current);
   addEventListener('hashchange',()=>{const h2=location.hash.replace('#','');if(h2!==current&&NAV.some(n=>n[0]===h2&&n[0]!=='--'&&allowed(n[0])))go(h2);});
 })();
