@@ -87,3 +87,23 @@ body.qa,body.qa *{font-family:Arial,Helvetica,"Liberation Sans",sans-serif}
 @media(max-width:900px){.qa-nav-h{display:none}}
 
 .qa3-top{z-index:1200}
+
+/* ----- grouped staff navigation ----- */
+.qa-nav-section{display:flex;flex-direction:column;gap:4px}
+.qa-nav-section .qa-nav-h{margin:14px 8px 4px}
+.qa-nav-section:first-child .qa-nav-h{display:none}
+.qa-nav-more{margin:0 2px 4px;border-radius:10px;color:var(--navy)}
+.qa-nav-more summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border-radius:9px;cursor:pointer;list-style:none;font-size:14px;font-weight:600;color:var(--muted)}
+.qa-nav-more summary::-webkit-details-marker{display:none}
+.qa-nav-more summary:hover{background:#f2f6fa;color:var(--navy)}
+.qa-nav-more[open] summary span{transform:rotate(180deg)}
+.qa-nav-sub{display:grid;gap:3px;padding:3px 0 5px 12px}
+.qa-nav-sub button{font-size:14px;padding:10px 12px;font-weight:500}
+.qa-nav-sub button[aria-current=page]{background:var(--navy);color:#fff}
+@media(max-width:900px){
+ .qa-nav-section{flex:0 0 auto;min-width:max-content}
+ .qa-nav-section .qa-nav-h{display:none}
+ .qa-nav-more{position:relative}
+ .qa-nav-more[open]{background:#f7fafd}
+ .qa-nav-sub{padding-left:4px}
+}
