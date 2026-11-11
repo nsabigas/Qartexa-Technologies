@@ -38,7 +38,14 @@ modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closeModal();});
 
 /* ---------- navigation ---------- */
-const NAV=[['overview','Overview'],['--','Content'],['solutions','Solutions'],['jobs','Jobs'],['applications','Applications'],['posts','Blog'],['tenders','Tenders'],['--','Website'],['pages','Edit pages'],['heroes','Page heroes'],['media','Media library'],['siteimages','Site images'],['appearance','Appearance'],['branding','Logo & header'],['contact','Contact details'],['social','Social media'],['partners','Partners'],['edits','All edits'],['--','Forms'],['forms','Form builder'],['submissions','Form submissions'],['--','Administration'],['staff','Staff & roles'],['activity','Activity log'],['--','Me'],['account','Account']];
+const NAV_GROUPS=[
+ {title:'',links:[['overview','Overview']]},
+ {title:'Content',links:[['solutions','Solutions'],['posts','Blog']],more:'More content',extra:[['jobs','Jobs'],['applications','Applications'],['tenders','Tenders']]},
+ {title:'Website',links:[['pages','Edit pages'],['appearance','Appearance']],more:'More website settings',extra:[['heroes','Page heroes'],['media','Media library'],['siteimages','Site images'],['branding','Logo & header'],['contact','Contact details'],['social','Social media'],['partners','Partners'],['edits','All edits']]},
+ {title:'Forms',links:[['submissions','Form submissions']],more:'Form management',extra:[['forms','Form builder']]},
+ {title:'Administration',links:[['staff','Staff & roles']],more:'System',extra:[['activity','Activity log']]},
+ {title:'My account',links:[['account','Account']]}
+];
 /* which role may see which section (the database enforces the same rules; this only hides what you cannot use) */
 const AREA={solutions:'content',posts:'content',pages:'content',branding:'content',contact:'content',partners:'content',edits:'content',jobs:'hr',applications:'hr',tenders:'tenders',media:'content',heroes:'content',siteimages:'content',appearance:'appearance',social:'appearance',forms:'forms',submissions:'submissions',staff:'staff',activity:'audit'};
 let ROLE=null;
@@ -47,8 +54,16 @@ const visibleNav=()=>NAV.filter((n,i)=>n[0]==='--'?(NAV.slice(i+1).findIndex(x=>
 const VIEWS={};   /* extra sections register themselves here (js/qx-admin2.js) */
 let current='overview';
 function buildNav(){
-  $('#qa-nav').innerHTML=visibleNav().map(n=>n[0]==='--'?'<div class="qa-nav-h">'+E(n[1])+'</div>':'<button type="button" data-s="'+n[0]+'"'+(n[0]===current?' aria-current="page"':'')+'>'+E(n[1])+'<span class="qa-n" data-n="'+n[0]+'"></span></button>').join('');
-  $('#qa-nav').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+  const button=n=>'<button type="button" data-s="'+n[0]+'"'+(n[0]===current?' aria-current="page"':'')+'>'+E(n[1])+'<span class="qa-n" data-n="'+n[0]+'"></span></button>';
+  $('#qa-nav').innerHTML=NAV_GROUPS.map(g=>{
+    const links=g.links.filter(n=>allowed(n[0])),extra=(g.extra||[]).filter(n=>allowed(n[0]));
+    if(!links.length&&!extra.length)return '';
+    return '<section class="qa-nav-section">'+(g.title?'<div class="qa-nav-h">'+E(g.title)+'</div>':'')+
+      links.map(button).join('')+
+      (extra.length?'<details class="qa-nav-more"'+(extra.some(n=>n[0]===current)?' open':'')+'><summary>'+E(g.more||'More')+'<span aria-hidden="true">⌄</span></summary><div class="qa-nav-sub">'+extra.map(button).join('')+'</div></details>':'')+
+      '</section>';
+  }).join('');
+  $('#qa-nav').querySelectorAll('button[data-s]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
 }
 function go(s){current=s;history.replaceState(null,'','#'+s);buildNav();if(!allowed(s)){s=current='overview';}({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)))();main.focus&&main.focus();}
 async function counts(){
