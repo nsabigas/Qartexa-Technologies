@@ -233,3 +233,29 @@ img{max-width:100%;display:block}
     white-space: nowrap;
   }
 }
+
+/* Keep the two-line hero promise fully inside the copy column beside the image. */
+.phase4-hero .hero-grid { grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); column-gap: clamp(28px, 4vw, 58px); }
+.phase4-hero-copy { min-width: 0; max-width: 100%; }
+.phase4-hero h1 { max-width: 100%; }
+.phase4-hero h1 .hero-headline {
+  width: 100%;
+  max-width: 100%;
+  font-size: clamp(27px, 3.15vw, 40px);
+  line-height: 1.16;
+  letter-spacing: -.03em;
+}
+.phase4-hero h1 .hero-headline > span {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .phase4-hero .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .phase4-hero-copy { width: 100%; max-width: 100%; }
+  .phase4-hero h1 .hero-headline {
+    font-size: clamp(18px, 5.35vw, 23px);
+    line-height: 1.22;
+    letter-spacing: -.025em;
+  }
+}
