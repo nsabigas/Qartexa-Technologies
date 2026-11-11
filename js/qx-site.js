@@ -18,7 +18,7 @@ const dyn=[];   // dynamic elements that must re-render when the language change
 function css(){
   if(document.getElementById('qx-site-css'))return;
   const s=document.createElement('style');s.id='qx-site-css';
-  s.textContent='.qx-noimg{display:block;aspect-ratio:1920/819;background:linear-gradient(135deg,#062650,#0b376d 60%,#e80000 160%)}.qx-gone{display:none!important}';
+  s.textContent='.qx-noimg{display:block;aspect-ratio:1920/819;background:linear-gradient(135deg,#062650,#0b376d 60%,#e80000 160%)}.qx-gone{display:none!important}.phase4-ecosystem[hidden],.phase4-ecosystem [hidden]{display:none!important}';
   document.head.appendChild(s);
 }
 const href=r=>r.is_core?B+'solutions/'+r.slug+'.html':B+'solution.html?s='+encodeURIComponent(r.slug);
@@ -118,10 +118,90 @@ async function homeBand(){
 }
 
 function rerender(){dyn.forEach(render);}
+async function applyPartners(){
+  const root=document.querySelector('#ecosystem');
+  if(!root)return;
+  try{
+    const results=await Promise.all([QX.publicRows('partners'),QX.settings()]);
+    const rows=results[0]||[],settings=results[1]||{};
+    if(settings.partners_section_enabled===false){root.hidden=true;return;}
+    root.hidden=false;
+    if(!rows.length)return;
+    const live=new Set(rows.map(r=>String(r.logo_url||'').split('/').pop().toLowerCase()).filter(Boolean));
+    root.querySelectorAll('.partner-logo img').forEach(img=>{
+      const file=String(img.getAttribute('src')||'').split('/').pop().toLowerCase();
+      if(live.has(file)){img.closest('.partner-logo').hidden=false;img.closest('.partner-logo').style.display='';}
+      else if(file){img.closest('.partner-logo').hidden=true;img.closest('.partner-logo').style.display='none';}
+    });
+    root.querySelectorAll('.partner-group').forEach(group=>{
+      const logos=[...group.querySelectorAll('.partner-logo')];
+      if(logos.length&&logos.every(el=>el.hidden)){group.hidden=true;group.style.display='none';}
+    });
+  }catch(e){/* Keep the existing static partner presentation if data cannot be read. */}
+}
+function updateFooterNavigation(){
+  const footer=document.querySelector('footer');
+  if(!footer)return;
+  const grid=footer.querySelector('.footer-grid');
+  if(grid){
+    const columns=[...grid.children];
+    const resources=columns.find(col=>{const h=col.querySelector('h4');return h&&(h.textContent.trim().toLowerCase()==='industries'||h.textContent.trim().toLowerCase()==='resources'||h.hasAttribute('data-qx-footer-resources'));});
+    if(resources){
+      resources.setAttribute('data-qx-footer-resources','true');
+      resources.innerHTML='<h4 data-en="Resources" data-fr="Ressources">Resources</h4>'+
+        '<a href="careers.html" data-en="Careers" data-fr="Carrières">Careers</a>'+
+        '<a href="blog.html" data-en="Blog" data-fr="Blog">Blog</a>'+
+        '<a href="tenders.html" data-en="Tenders" data-fr="Appels d’offres">Tenders</a>'+
+        '<a href="privacy.html" data-en="Privacy Policy" data-fr="Politique de confidentialité">Privacy Policy</a>'+
+        '<a href="terms.html" data-en="Terms of Use" data-fr="Conditions d’utilisation">Terms of Use</a>'+
+        '<a href="cookies.html" data-en="Cookie Preferences" data-fr="Préférences en matière de cookies">Cookie Preferences</a>';
+    }
+  }
+  const bottom=footer.querySelector('.copyright');
+  if(bottom){
+    const resources=bottom.querySelector('.footer-resources');if(resources)resources.remove();
+    const legal=bottom.querySelector('.legal-links');if(legal)legal.remove();
+  }
+  translateFooterResources();
+}
+function translateFooterResources(){
+  const fr=U.lang()==='fr';
+  document.querySelectorAll('[data-qx-footer-resources] [data-en][data-fr]').forEach(el=>{
+    const value=fr?el.getAttribute('data-fr'):el.getAttribute('data-en');
+    if(value!==null)el.textContent=value;
+  });
+}
+function removeObsoleteFooterDetails(){
+  document.querySelectorAll('footer .social-handle').forEach(el=>el.remove());
+  document.querySelectorAll('footer a[href="https://www.qartexa.com"],footer a[href="https://www.qartexa.com/"],footer a[href="http://www.qartexa.com"]').forEach(el=>el.remove());
+  document.querySelectorAll('footer a[href="portal.html"],footer a[href="./portal.html"]').forEach(el=>el.remove());
+}
+function addStaffPortalIcon(){
+  document.querySelectorAll('a.qx-portal-link').forEach(link=>{
+    link.setAttribute('aria-label','Staff portal');
+    link.setAttribute('title','Staff portal');
+    link.style.fontSize='0';
+    link.style.lineHeight='1';
+    if(link.querySelector('.qx-staff-icon'))return;
+    const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    icon.setAttribute('class','qx-staff-icon');
+    icon.setAttribute('viewBox','0 0 24 24');
+    icon.setAttribute('width','18');icon.setAttribute('height','18');
+    icon.setAttribute('aria-hidden','true');icon.setAttribute('focusable','false');
+    icon.innerHTML='<circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.5-3.4 3.1-5.5 7-5.5s6.5 2.1 7 5.5"></path>';
+    icon.style.cssText='display:inline-block;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round';
+    link.prepend(icon);
+  });
+}
 function init(){
   QX.publicRows('solutions').then(applySolutions).catch(()=>{});
+  applyPartners();
+  updateFooterNavigation();
+  removeObsoleteFooterDetails();
+  addStaffPortalIcon();
   homeBand().catch(()=>{});
   U.onLang(rerender);
+  U.onLang(translateFooterResources);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();

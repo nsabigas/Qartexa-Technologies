@@ -501,3 +501,22 @@ button, input, select, textarea {
   .phase4-industries .phase4-industry-grid .industry:nth-last-child(-n+3) { border-bottom: 1px solid rgba(255,255,255,.14); }
   .phase4-industries .phase4-industry-grid .industry:last-child { border-bottom: 0; }
 }
+
+/* Keep directional markers in text presentation instead of platform emoji artwork. */
+.delivery-journey > .page-card::after,
+.delivery-steps li::after,
+.mega-col a::after {
+  font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Arial Unicode MS", sans-serif !important;
+  font-variant-emoji: text !important;
+  font-weight: 400;
+  line-height: 1;
+}
+.delivery-journey > .page-card:not(:nth-child(3)):not(:nth-child(6))::after { content: "\2192\FE0E" !important; }
+.delivery-journey > .page-card:nth-child(3)::after { content: "\2193\FE0E" !important; }
+.delivery-journey > .page-card:nth-child(4):not(:nth-child(3)):not(:nth-child(6))::after,
+.delivery-journey > .page-card:nth-child(5):not(:nth-child(3)):not(:nth-child(6))::after { content: "\2190\FE0E" !important; }
+.delivery-steps li::after { font-size: 17px !important; }
+@media (max-width: 767px) {
+  .delivery-journey > .page-card::after,
+  .delivery-steps li::after { font-size: 16px !important; }
+}

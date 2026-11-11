@@ -38,7 +38,15 @@ modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)closeModal();});
 
 /* ---------- navigation ---------- */
-const NAV=[['overview','Overview'],['--','Content'],['solutions','Solutions'],['jobs','Jobs'],['applications','Applications'],['posts','Blog'],['tenders','Tenders'],['--','Website'],['pages','Edit pages'],['heroes','Page heroes'],['media','Media library'],['siteimages','Site images'],['appearance','Appearance'],['branding','Logo & header'],['contact','Contact details'],['social','Social media'],['partners','Partners'],['edits','All edits'],['--','Forms'],['forms','Form builder'],['submissions','Form submissions'],['--','Administration'],['staff','Staff & roles'],['activity','Activity log'],['--','Me'],['account','Account']];
+const NAV_GROUPS=[
+ {title:'',links:[['overview','Overview']]},
+ {title:'Content',links:[['solutions','Solutions'],['posts','Blog']],more:'More content',extra:[['jobs','Jobs'],['applications','Applications'],['tenders','Tenders']]},
+ {title:'Website',links:[['pages','Edit pages'],['appearance','Appearance']],more:'More website settings',extra:[['heroes','Page heroes'],['media','Media library'],['siteimages','Site images'],['branding','Logo & header'],['contact','Contact details'],['social','Social media'],['partners','Partners'],['edits','All edits']]},
+ {title:'Forms',links:[['submissions','Form submissions']],more:'Form management',extra:[['forms','Form builder']]},
+ {title:'Administration',links:[['staff','Staff & roles']],more:'System',extra:[['activity','Activity log']]},
+ {title:'My account',links:[['account','Account']]}
+];
+const NAV=NAV_GROUPS.flatMap(g=>g.links.concat(g.extra||[]));
 /* which role may see which section (the database enforces the same rules; this only hides what you cannot use) */
 const AREA={solutions:'content',posts:'content',pages:'content',branding:'content',contact:'content',partners:'content',edits:'content',jobs:'hr',applications:'hr',tenders:'tenders',media:'content',heroes:'content',siteimages:'content',appearance:'appearance',social:'appearance',forms:'forms',submissions:'submissions',staff:'staff',activity:'audit'};
 let ROLE=null;
@@ -46,11 +54,44 @@ const allowed=n=>n==='--'||!AREA[n]||QX.auth.can(ROLE,AREA[n]);
 const visibleNav=()=>NAV.filter((n,i)=>n[0]==='--'?(NAV.slice(i+1).findIndex(x=>x[0]==='--')<0?NAV.slice(i+1):NAV.slice(i+1,i+1+NAV.slice(i+1).findIndex(x=>x[0]==='--'))).some(x=>allowed(x[0])):allowed(n[0]));
 const VIEWS={};   /* extra sections register themselves here (js/qx-admin2.js) */
 let current='overview';
-function buildNav(){
-  $('#qa-nav').innerHTML=visibleNav().map(n=>n[0]==='--'?'<div class="qa-nav-h">'+E(n[1])+'</div>':'<button type="button" data-s="'+n[0]+'"'+(n[0]===current?' aria-current="page"':'')+'>'+E(n[1])+'<span class="qa-n" data-n="'+n[0]+'"></span></button>').join('');
-  $('#qa-nav').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+const sectionHistory=[];
+function scrollAdminToTop(){
+  if(document.scrollingElement)document.scrollingElement.scrollTop=0;
+  document.documentElement.scrollTop=0;document.body.scrollTop=0;main.scrollTop=0;
+  window.scrollTo({top:0,left:0,behavior:'auto'});
 }
-function go(s){current=s;history.replaceState(null,'','#'+s);buildNav();if(!allowed(s)){s=current='overview';}({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)))();main.focus&&main.focus();}
+function buildNav(){
+  const button=n=>'<button type="button" data-s="'+n[0]+'"'+(n[0]===current?' aria-current="page"':'')+'>'+E(n[1])+'<span class="qa-n" data-n="'+n[0]+'"></span></button>';
+  $('#qa-nav').innerHTML=NAV_GROUPS.map(g=>{
+    const links=g.links.filter(n=>allowed(n[0])),extra=(g.extra||[]).filter(n=>allowed(n[0]));
+    if(!links.length&&!extra.length)return '';
+    const compact=window.matchMedia('(max-width:900px)').matches;
+    const groupOpen=!compact||links.concat(extra).some(n=>n[0]===current);
+    return '<details class="qa-nav-section"'+(groupOpen?' open':'')+'>'+(g.title?'<summary class="qa-nav-h">'+E(g.title)+'<span class="chev" aria-hidden="true"></span></summary>':'')+
+      '<div class="qa-nav-section-links">'+links.map(button).join('')+
+      (extra.length?'<details class="qa-nav-more"'+(extra.some(n=>n[0]===current)?' open':'')+'><summary>'+E(g.more||'More')+'<span class="chev" aria-hidden="true"></span></summary><div class="qa-nav-sub">'+extra.map(button).join('')+'</div></details>':'')+
+      '</div></details>';
+  }).join('');
+  $('#qa-nav').querySelectorAll('button[data-s]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
+}
+function go(s,options){
+  options=options||{};
+  if(!allowed(s))s='overview';
+  if(s!==current&&!options.fromBack)sectionHistory.push(current);
+  current=s;
+  document.body.classList.remove('qa-nav-open');
+  history.replaceState(null,'','#'+s);
+  buildNav();
+  const view=({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)));
+  view();
+  if(main.focus)main.focus({preventScroll:true});
+  if(window.requestAnimationFrame)requestAnimationFrame(scrollAdminToTop);else scrollAdminToTop();
+}
+function goBack(){
+  const previous=sectionHistory.pop();
+  if(previous)go(previous,{fromBack:true});
+  else if(current!=='overview')go('overview',{fromBack:true});
+}
 async function counts(){
   const q=async(t,w)=>{try{return (await S.list(t,{where:w})).length;}catch(e){return 0;}};
   const [a,b,c,d]=await Promise.all([q('applications',{status:'new'}),q('jobs',{status:'open'}),q('posts',{status:'published'}),q('tenders',{status:'open'})]);
@@ -81,12 +122,19 @@ async function list(type){
     const vis=rows.filter(r=>(!f.st||r.status===f.st)&&(!f.q||JSON.stringify(r).toLowerCase().indexOf(f.q.toLowerCase())>-1));
     const keep=document.activeElement&&document.activeElement.id==='qa-q';
     main.innerHTML='<div class="qa-head"><h1>'+E(sc.label)+'</h1><button class="qx-btn" id="qa-add">+ New '+E(sc.one)+'</button></div>'+
+     (type==='partners'?'<div class="qa-panel" style="margin:0 0 16px;max-width:none"><div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap"><div><strong>Partners section on public website</strong><p class="qa-muted" style="margin:4px 0 0">Turn this off to hide the whole Technology partners section. Individual partners can still be hidden below.</p></div><label style="display:flex;align-items:center;gap:9px;font-weight:700"><input type="checkbox" id="qa-partners-section" checked> Show section</label></div><div id="qa-partners-setting-msg" aria-live="polite"></div></div>':'')+
      '<div class="qx-toolbar"><input id="qa-q" type="search" placeholder="Search…" value="'+E(f.q)+'" aria-label="Search"><select id="qa-st" aria-label="Status"><option value="">All statuses</option>'+sc.status.map(s=>'<option value="'+s[0]+'"'+(f.st===s[0]?' selected':'')+'>'+s[1]+'</option>').join('')+'</select><span class="qx-count">'+vis.length+' of '+rows.length+'</span></div>'+
-     (vis.length?'<div class="qa-table-wrap"><table class="qa-table"><thead><tr>'+sc.cols.map(c=>'<th>'+E(c[1])+'</th>').join('')+'<th>Status</th><th></th></tr></thead><tbody>'+vis.map(r=>'<tr>'+sc.cols.map(c=>'<td>'+E(c[2]?c[2](r):(/date|created|closing|published_at/.test(c[0])?fmt(r[c[0]]):(r[c[0]]==null?'':r[c[0]])))+'</td>').join('')+'<td>'+badge(r.status,sc.status)+(r.is_core?' <span class="qx-badge">Core</span>':'')+'</td><td class="qa-row-actions"><button data-e="'+r.id+'">Edit</button><button data-d="'+r.id+'" class="danger">'+(r.is_core?'Hide':'Delete')+'</button></td></tr>').join('')+'</tbody></table></div>':'<div class="qx-empty">Nothing here yet. Click “New '+E(sc.one)+'” to add one.</div>');
+     (vis.length?'<div class="qa-table-wrap"><table class="qa-table"><thead><tr>'+sc.cols.map(c=>'<th>'+E(c[1])+'</th>').join('')+'<th>Status</th><th></th></tr></thead><tbody>'+vis.map(r=>'<tr>'+sc.cols.map(c=>'<td>'+E(c[2]?c[2](r):(/date|created|closing|published_at/.test(c[0])?fmt(r[c[0]]):(r[c[0]]==null?'':r[c[0]])))+'</td>').join('')+'<td>'+badge(r.status,sc.status)+(r.is_core?' <span class="qx-badge">Core</span>':'')+'</td><td class="qa-row-actions"><button data-e="'+r.id+'">Edit</button>'+(type==='partners'?'<button data-partner-toggle="'+r.id+'">'+(r.status==='published'?'Hide':'Show')+'</button>':'')+'<button data-d="'+r.id+'" class="danger">'+(r.is_core?'Hide':'Delete')+'</button></td></tr>').join('')+'</tbody></table></div>':'<div class="qx-empty">Nothing here yet. Click “New '+E(sc.one)+'” to add one.</div>');
     $('#qa-add').addEventListener('click',()=>edit(type,null,reload));
+    if(type==='partners'){
+      const toggle=$('#qa-partners-section'),note=$('#qa-partners-setting-msg');
+      QX.settings().then(cfg=>{if(toggle)toggle.checked=cfg.partners_section_enabled!==false;}).catch(()=>{});
+      if(toggle)toggle.addEventListener('change',async()=>{toggle.disabled=true;try{await S.upsert('site_settings',{key:'partners_section_enabled',value:toggle.checked},'key');QX.bust();if(note)note.innerHTML='<div class="qx-status ok">Saved. The public website will update after refresh.</div>';}catch(e){toggle.checked=!toggle.checked;if(note)note.innerHTML='<div class="qx-status err">'+E(e.message)+'</div>';}finally{toggle.disabled=false;}});
+    }
     const q=$('#qa-q');q.addEventListener('input',()=>{f.q=q.value;draw();});$('#qa-st').addEventListener('change',e=>{f.st=e.target.value;draw();});
     if(keep){const q2=$('#qa-q');q2.focus();q2.setSelectionRange(q2.value.length,q2.value.length);}
     main.querySelectorAll('[data-e]').forEach(b=>b.addEventListener('click',()=>edit(type,rows.find(r=>r.id===b.dataset.e),reload)));
+    main.querySelectorAll('[data-partner-toggle]').forEach(b=>b.addEventListener('click',async()=>{const r=rows.find(x=>x.id===b.dataset.partnerToggle);if(!r)return;const next=r.status==='published'?'draft':'published';try{await S.save('partners',{id:r.id,status:next});toast(next==='published'?'Partner shown on the website.':'Partner hidden from the website.');reload();}catch(e){toast(e.message,true);}}));
     main.querySelectorAll('[data-d]').forEach(b=>b.addEventListener('click',async()=>{
       const r=rows.find(x=>x.id===b.dataset.d);
       if(r.is_core){if(!confirm('Hide this core solution from the website? It will disappear from menus, cards and its own page. You can publish it again later.'))return;await S.save(type,{id:r.id,status:'draft'});toast('Hidden from the website.');}
@@ -256,10 +304,31 @@ if(window.QXA_EXT3)window.QXA_EXT3(window.QXA);
 (async function(){
   ROLE=QX.auth.session()?await QX.auth.role():null;if(!ROLE){location.replace('portal.html');return;}
   try{await S.rpc('expire_items');}catch(e){}   /* tidy: marks expired jobs/tenders as closed */
-  const s=QX.auth.session();$('#qa-user').textContent=(s.user&&s.user.email)||'';
+  const s=QX.auth.session();
+  const user=s&&s.user?s.user:{},meta=user.user_metadata||{};
+  const displayName=meta.full_name||meta.name||meta.display_name||user.email||'My profile';
+  const avatar=meta.avatar_url||meta.picture||meta.photo_url||'';
+  const profile=$('#qa-profile');
+  if(profile){
+    const userIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.5-3.4 3.1-5.5 7-5.5s6.5 2.1 7 5.5"></path></svg>';
+    const pic=avatar?'<img src="'+E(avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="qa-profile-fallback" aria-hidden="true">'+userIcon+'</span>';
+    profile.innerHTML='<button type="button" class="qa-profile-trigger" id="qa-profile-trigger" aria-label="Open account menu" aria-haspopup="true" aria-expanded="false" aria-controls="qa-profile-menu">'+pic+'</button><div class="qa-profile-menu" id="qa-profile-menu" hidden><div class="qa-profile-identity">'+(avatar?'<img src="'+E(avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="qa-profile-large">'+userIcon+'</span>')+'<div><strong>'+E(displayName)+'</strong><span>'+E(user.email||'')+'</span></div></div><button type="button" data-profile="account">Profile & account settings</button><button type="button" data-profile="logout">Sign out</button></div>';
+    const trigger=$('#qa-profile-trigger'),menu=$('#qa-profile-menu');
+    trigger.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;trigger.setAttribute('aria-expanded',String(open));});
+    profile.querySelector('[data-profile="account"]').addEventListener('click',()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');go('account');});
+    profile.querySelector('[data-profile="logout"]').addEventListener('click',signOut);
+    document.addEventListener('click',e=>{if(!profile.contains(e.target)){menu.hidden=true;trigger.setAttribute('aria-expanded','false');}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.hidden=true;trigger.setAttribute('aria-expanded','false');}});
+  }
   $('#qa-signout').addEventListener('click',signOut);
+  const backButton=$('#qa-back');if(backButton)backButton.addEventListener('click',goBack);
+  const navToggle=$('#qa-nav-toggle');
+  if(navToggle)navToggle.addEventListener('click',()=>{const open=document.body.classList.toggle('qa-nav-open');navToggle.setAttribute('aria-expanded',String(open));});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('qa-nav-open');if(navToggle)navToggle.setAttribute('aria-expanded','false');}});
+  const mq=window.matchMedia('(max-width:900px)');
+  if(mq.addEventListener)mq.addEventListener('change',()=>{document.body.classList.remove('qa-nav-open');buildNav();});
   const h=location.hash.replace('#','');current=NAV.some(n=>n[0]===h&&n[0]!=='--'&&allowed(n[0]))?h:'overview';
-  $('#qa-user').textContent=((s.user&&s.user.email)||'')+' · '+({super_admin:'Super Administrator',admin:'Administrator',editor:'Website Editor',hr:'HR Manager',content:'Content Manager'}[ROLE]||ROLE);
+  const roleLabel=({super_admin:'Super Administrator',admin:'Administrator',editor:'Website Editor',hr:'HR Manager',content:'Content Manager'}[ROLE]||ROLE);if(profile)profile.setAttribute('aria-label',displayName+' — '+roleLabel);
   buildNav();go(current);
   addEventListener('hashchange',()=>{const h2=location.hash.replace('#','');if(h2!==current&&NAV.some(n=>n[0]===h2&&n[0]!=='--'&&allowed(n[0])))go(h2);});
 })();
