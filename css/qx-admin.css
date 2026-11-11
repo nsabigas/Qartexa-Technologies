@@ -145,3 +145,22 @@ body.qa,body.qa *{font-family:Arial,Helvetica,"Liberation Sans",sans-serif}
   .qa-table{min-width:620px}
   .qa-dialog{padding:18px}
 }
+
+
+/* ----- profile dropdown ----- */
+.qa-profile{position:relative;display:flex;align-items:center}
+.qa-profile-trigger{display:flex;align-items:center;gap:9px;border:1px solid var(--line)!important;border-radius:999px!important;padding:5px 10px 5px 5px!important;background:#fff!important;color:var(--navy)!important}
+.qa-profile-trigger img,.qa-profile-fallback{width:34px;height:34px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:#eaf2f9;color:var(--navy);font-size:21px}
+.qa-profile-name{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qa-profile-menu{position:absolute;right:0;top:calc(100% + 9px);z-index:1400;width:min(290px,calc(100vw - 24px));padding:9px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 42px rgba(6,38,80,.18)}
+.qa-profile-menu[hidden]{display:none}
+.qa-profile-identity{display:flex;align-items:center;gap:12px;padding:12px 10px 14px;border-bottom:1px solid #e8eef4;margin-bottom:6px;min-width:0}
+.qa-profile-identity img,.qa-profile-large{width:44px;height:44px;flex:0 0 44px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:#eaf2f9;color:var(--navy);font-size:25px}
+.qa-profile-identity div{display:grid;gap:3px;min-width:0}
+.qa-profile-identity strong,.qa-profile-identity span{overflow-wrap:anywhere}
+.qa-profile-identity div span{font-size:12px;color:var(--muted)}
+.qa-profile-menu>button{display:block;width:100%;text-align:left;padding:11px 12px;border:0;border-radius:9px;background:transparent;color:var(--navy);font:600 14px Arial,sans-serif;cursor:pointer}
+.qa-profile-menu>button:hover{background:#f1f6fa}
+.qa-signout-fallback{display:none!important}
+@media(max-width:900px){.qa-top .qa-right{gap:8px}.qa-profile-name{display:none}.qa-profile-trigger{padding:4px!important}.qa-profile-trigger img,.qa-profile-fallback{width:32px;height:32px}}
+@media(max-width:520px){.qa-profile-menu{right:0}}
