@@ -46,6 +46,7 @@ const NAV_GROUPS=[
  {title:'Administration',links:[['staff','Staff & roles']],more:'System',extra:[['activity','Activity log']]},
  {title:'My account',links:[['account','Account']]}
 ];
+const NAV=NAV_GROUPS.flatMap(g=>g.links.concat(g.extra||[]));
 /* which role may see which section (the database enforces the same rules; this only hides what you cannot use) */
 const AREA={solutions:'content',posts:'content',pages:'content',branding:'content',contact:'content',partners:'content',edits:'content',jobs:'hr',applications:'hr',tenders:'tenders',media:'content',heroes:'content',siteimages:'content',appearance:'appearance',social:'appearance',forms:'forms',submissions:'submissions',staff:'staff',activity:'audit'};
 let ROLE=null;
