@@ -105,9 +105,9 @@ body.qa,body.qa *{font-family:Arial,Helvetica,"Liberation Sans",sans-serif}
 /* Make the current page clearly identifiable in the admin navigation. */
 .qa-nav-section-links>button[aria-current=page],
 .qa-nav-sub button[aria-current=page]{
-  background:#e6f0f8;
-  color:#062650;
-  box-shadow:inset 3px 0 0 #1672b8;
+  background:#fff0f0;
+  color:#a51f2b;
+  box-shadow:inset 3px 0 0 #c62828;
   font-weight:700;
 }
 @media(max-width:900px){
