@@ -54,6 +54,12 @@ const allowed=n=>n==='--'||!AREA[n]||QX.auth.can(ROLE,AREA[n]);
 const visibleNav=()=>NAV.filter((n,i)=>n[0]==='--'?(NAV.slice(i+1).findIndex(x=>x[0]==='--')<0?NAV.slice(i+1):NAV.slice(i+1,i+1+NAV.slice(i+1).findIndex(x=>x[0]==='--'))).some(x=>allowed(x[0])):allowed(n[0]));
 const VIEWS={};   /* extra sections register themselves here (js/qx-admin2.js) */
 let current='overview';
+const sectionHistory=[];
+function scrollAdminToTop(){
+  if(document.scrollingElement)document.scrollingElement.scrollTop=0;
+  document.documentElement.scrollTop=0;document.body.scrollTop=0;main.scrollTop=0;
+  window.scrollTo({top:0,left:0,behavior:'auto'});
+}
 function buildNav(){
   const button=n=>'<button type="button" data-s="'+n[0]+'"'+(n[0]===current?' aria-current="page"':'')+'>'+E(n[1])+'<span class="qa-n" data-n="'+n[0]+'"></span></button>';
   $('#qa-nav').innerHTML=NAV_GROUPS.map(g=>{
@@ -61,14 +67,31 @@ function buildNav(){
     if(!links.length&&!extra.length)return '';
     const compact=window.matchMedia('(max-width:900px)').matches;
     const groupOpen=!compact||links.concat(extra).some(n=>n[0]===current);
-    return '<details class="qa-nav-section"'+(groupOpen?' open':'')+'>'+(g.title?'<summary class="qa-nav-h">'+E(g.title)+'<span aria-hidden="true">⌄</span></summary>':'')+
+    return '<details class="qa-nav-section"'+(groupOpen?' open':'')+'>'+(g.title?'<summary class="qa-nav-h">'+E(g.title)+'<span class="chev" aria-hidden="true"></span></summary>':'')+
       '<div class="qa-nav-section-links">'+links.map(button).join('')+
-      (extra.length?'<details class="qa-nav-more"'+(extra.some(n=>n[0]===current)?' open':'')+'><summary>'+E(g.more||'More')+'<span aria-hidden="true">⌄</span></summary><div class="qa-nav-sub">'+extra.map(button).join('')+'</div></details>':'')+
+      (extra.length?'<details class="qa-nav-more"'+(extra.some(n=>n[0]===current)?' open':'')+'><summary>'+E(g.more||'More')+'<span class="chev" aria-hidden="true"></span></summary><div class="qa-nav-sub">'+extra.map(button).join('')+'</div></details>':'')+
       '</div></details>';
   }).join('');
   $('#qa-nav').querySelectorAll('button[data-s]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.s)));
 }
-function go(s){current=s;window.scrollTo({top:0,left:0,behavior:'auto'});main.scrollTop=0;document.documentElement.scrollTop=0;document.body.classList.remove('qa-nav-open');history.replaceState(null,'','#'+s);buildNav();if(!allowed(s)){s=current='overview';}({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)))();main.focus&&main.focus();}
+function go(s,options){
+  options=options||{};
+  if(!allowed(s))s='overview';
+  if(s!==current&&!options.fromBack)sectionHistory.push(current);
+  current=s;
+  document.body.classList.remove('qa-nav-open');
+  history.replaceState(null,'','#'+s);
+  buildNav();
+  const view=({overview:overview,applications:applications,account:account,pages:pagesView,branding:branding,contact:contactView,edits:editsView}[s]||VIEWS[s]||(()=>list(s)));
+  view();
+  if(main.focus)main.focus({preventScroll:true});
+  if(window.requestAnimationFrame)requestAnimationFrame(scrollAdminToTop);else scrollAdminToTop();
+}
+function goBack(){
+  const previous=sectionHistory.pop();
+  if(previous)go(previous,{fromBack:true});
+  else if(current!=='overview')go('overview',{fromBack:true});
+}
 async function counts(){
   const q=async(t,w)=>{try{return (await S.list(t,{where:w})).length;}catch(e){return 0;}};
   const [a,b,c,d]=await Promise.all([q('applications',{status:'new'}),q('jobs',{status:'open'}),q('posts',{status:'published'}),q('tenders',{status:'open'})]);
@@ -280,8 +303,9 @@ if(window.QXA_EXT3)window.QXA_EXT3(window.QXA);
   const avatar=meta.avatar_url||meta.picture||meta.photo_url||'';
   const profile=$('#qa-profile');
   if(profile){
-    const pic=avatar?'<img src="'+E(avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="qa-profile-fallback" aria-hidden="true">♙</span>';
-    profile.innerHTML='<button type="button" class="qa-profile-trigger" id="qa-profile-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="qa-profile-menu">'+pic+'<span class="qa-profile-name">'+E(displayName)+'</span><span aria-hidden="true">⌄</span></button><div class="qa-profile-menu" id="qa-profile-menu" hidden><div class="qa-profile-identity">'+(avatar?'<img src="'+E(avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="qa-profile-large">♙</span>')+'<div><strong>'+E(displayName)+'</strong><span>'+E(user.email||'')+'</span></div></div><button type="button" data-profile="account">Profile & account settings</button><button type="button" data-profile="logout">Sign out</button></div>';
+    const userIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.5-3.4 3.1-5.5 7-5.5s6.5 2.1 7 5.5"></path></svg>';
+    const pic=avatar?'<img src="'+E(avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="qa-profile-fallback" aria-hidden="true">'+userIcon+'</span>';
+    profile.innerHTML='<button type="button" class="qa-profile-trigger" id="qa-profile-trigger" aria-label="Open account menu" aria-haspopup="true" aria-expanded="false" aria-controls="qa-profile-menu">'+pic+'</button><div class="qa-profile-menu" id="qa-profile-menu" hidden><div class="qa-profile-identity">'+(avatar?'<img src="'+E(avatar)+'" alt="" referrerpolicy="no-referrer">':'<span class="qa-profile-large">'+userIcon+'</span>')+'<div><strong>'+E(displayName)+'</strong><span>'+E(user.email||'')+'</span></div></div><button type="button" data-profile="account">Profile & account settings</button><button type="button" data-profile="logout">Sign out</button></div>';
     const trigger=$('#qa-profile-trigger'),menu=$('#qa-profile-menu');
     trigger.addEventListener('click',()=>{const open=menu.hidden;menu.hidden=!open;trigger.setAttribute('aria-expanded',String(open));});
     profile.querySelector('[data-profile="account"]').addEventListener('click',()=>{menu.hidden=true;trigger.setAttribute('aria-expanded','false');go('account');});
@@ -290,6 +314,7 @@ if(window.QXA_EXT3)window.QXA_EXT3(window.QXA);
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.hidden=true;trigger.setAttribute('aria-expanded','false');}});
   }
   $('#qa-signout').addEventListener('click',signOut);
+  const backButton=$('#qa-back');if(backButton)backButton.addEventListener('click',goBack);
   const navToggle=$('#qa-nav-toggle');
   if(navToggle)navToggle.addEventListener('click',()=>{const open=document.body.classList.toggle('qa-nav-open');navToggle.setAttribute('aria-expanded',String(open));});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.body.classList.remove('qa-nav-open');if(navToggle)navToggle.setAttribute('aria-expanded','false');}});
