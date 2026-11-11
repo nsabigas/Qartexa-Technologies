@@ -714,3 +714,12 @@ body{transition:opacity .18s ease}
 
 /* User-requested cleanup: remove the decorative dot pattern from the homepage hero image */
 .hero-visual::after{content:none!important;display:none!important}
+
+
+/* Global footer cleanup: retain social icons, remove the obsolete text and links */
+footer .social-handle{display:none!important}
+footer .copyright a[href="portal.html"],
+footer .copyright a[href="./portal.html"],
+footer .footer-grid a[href="https://www.qartexa.com"],
+footer .footer-grid a[href="https://www.qartexa.com/"],
+footer .footer-grid a[href="http://www.qartexa.com"]{display:none!important}
