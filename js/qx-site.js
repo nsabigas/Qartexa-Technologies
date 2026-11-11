@@ -118,8 +118,30 @@ async function homeBand(){
 }
 
 function rerender(){dyn.forEach(render);}
+async function applyPartners(){
+  const root=document.querySelector('#ecosystem');
+  if(!root)return;
+  try{
+    const results=await Promise.all([QX.publicRows('partners'),QX.settings()]);
+    const rows=results[0]||[],settings=results[1]||{};
+    if(settings.partners_section_enabled===false){root.hidden=true;return;}
+    root.hidden=false;
+    if(!rows.length)return;
+    const live=new Set(rows.map(r=>String(r.logo_url||'').split('/').pop().toLowerCase()).filter(Boolean));
+    root.querySelectorAll('.partner-logo img').forEach(img=>{
+      const file=String(img.getAttribute('src')||'').split('/').pop().toLowerCase();
+      if(live.has(file))img.closest('.partner-logo').hidden=false;
+      else if(file)img.closest('.partner-logo').hidden=true;
+    });
+    root.querySelectorAll('.partner-group').forEach(group=>{
+      const logos=[...group.querySelectorAll('.partner-logo')];
+      if(logos.length&&logos.every(el=>el.hidden))group.hidden=true;
+    });
+  }catch(e){/* Keep the existing static partner presentation if data cannot be read. */}
+}
 function init(){
   QX.publicRows('solutions').then(applySolutions).catch(()=>{});
+  applyPartners();
   homeBand().catch(()=>{});
   U.onLang(rerender);
 }
