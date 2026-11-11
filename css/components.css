@@ -688,3 +688,35 @@ fieldset.field-group legend{font-weight:700;margin-bottom:8px;padding:0}
 @keyframes qx-hero-zoom{from{transform:scale(1)}to{transform:scale(1.06)}}
 @media(prefers-reduced-motion:reduce){.qx-zoom img{animation:none}}
 .qx-side-pic{display:contents}
+
+
+/* Language switch flags: show the language users can switch to. */
+.language-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.language-toggle::before {
+  content: "";
+  display: inline-block;
+  width: 21px;
+  height: 15px;
+  flex: 0 0 21px;
+  border: 1px solid rgba(6, 38, 80, .16);
+  border-radius: 2px;
+  box-sizing: border-box;
+  background-size: cover;
+  background-position: center;
+}
+html[lang="en"] .language-toggle::before {
+  /* French tricolour: blue, white, red. */
+  background: linear-gradient(to right, #002395 0 33.333%, #fff 33.333% 66.666%, #ed2939 66.666% 100%);
+}
+html[lang="fr"] .language-toggle::before {
+  /* Flag of England: red St George's cross on white. */
+  background:
+    linear-gradient(to bottom, transparent 0 40%, #c8102e 40% 60%, transparent 60% 100%),
+    linear-gradient(to right, transparent 0 40%, #c8102e 40% 60%, transparent 60% 100%),
+    #fff;
+}
