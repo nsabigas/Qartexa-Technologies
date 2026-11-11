@@ -207,3 +207,29 @@ img{max-width:100%;display:block}
   font-size: 14px !important;
   font-weight: 500;
 }
+
+/* Hero headline: intentional two-line composition on desktop and mobile. */
+.phase4-hero h1 .hero-headline {
+  display: block;
+  max-width: none;
+  font-size: clamp(38px, 4.2vw, 54px);
+  line-height: 1.12;
+  letter-spacing: -.035em;
+  font-weight: 700;
+  text-wrap: initial;
+}
+.phase4-hero h1 .hero-headline > span {
+  display: block;
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .phase4-hero h1 .hero-headline {
+    max-width: none;
+    font-size: clamp(21px, 6.1vw, 27px);
+    line-height: 1.2;
+    letter-spacing: -.025em;
+  }
+  .phase4-hero h1 .hero-headline > span {
+    white-space: nowrap;
+  }
+}
