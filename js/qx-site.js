@@ -171,14 +171,18 @@ function updateFooterNavigation(){
 }
 function addStaffPortalIcon(){
   document.querySelectorAll('a.qx-portal-link').forEach(link=>{
+    link.setAttribute('aria-label','Staff portal');
+    link.setAttribute('title','Staff portal');
+    link.style.fontSize='0';
+    link.style.lineHeight='1';
     if(link.querySelector('.qx-staff-icon'))return;
     const icon=document.createElementNS('http://www.w3.org/2000/svg','svg');
     icon.setAttribute('class','qx-staff-icon');
     icon.setAttribute('viewBox','0 0 24 24');
-    icon.setAttribute('width','16');icon.setAttribute('height','16');
+    icon.setAttribute('width','18');icon.setAttribute('height','18');
     icon.setAttribute('aria-hidden','true');icon.setAttribute('focusable','false');
     icon.innerHTML='<circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.5-3.4 3.1-5.5 7-5.5s6.5 2.1 7 5.5"></path>';
-    icon.style.cssText='display:inline-block;vertical-align:-3px;margin-right:6px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round';
+    icon.style.cssText='display:inline-block;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round';
     link.prepend(icon);
   });
 }
