@@ -171,6 +171,11 @@ function translateFooterResources(){
     if(value!==null)el.textContent=value;
   });
 }
+function removeObsoleteFooterDetails(){
+  document.querySelectorAll('footer .social-handle').forEach(el=>el.remove());
+  document.querySelectorAll('footer a[href="https://www.qartexa.com"],footer a[href="https://www.qartexa.com/"],footer a[href="http://www.qartexa.com"]').forEach(el=>el.remove());
+  document.querySelectorAll('footer a[href="portal.html"],footer a[href="./portal.html"]').forEach(el=>el.remove());
+}
 function addStaffPortalIcon(){
   document.querySelectorAll('a.qx-portal-link').forEach(link=>{
     link.setAttribute('aria-label','Staff portal');
@@ -192,6 +197,7 @@ function init(){
   QX.publicRows('solutions').then(applySolutions).catch(()=>{});
   applyPartners();
   updateFooterNavigation();
+  removeObsoleteFooterDetails();
   addStaffPortalIcon();
   homeBand().catch(()=>{});
   U.onLang(rerender);
