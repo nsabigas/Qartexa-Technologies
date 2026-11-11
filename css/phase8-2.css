@@ -723,3 +723,72 @@ footer .copyright a[href="./portal.html"],
 footer .footer-grid a[href="https://www.qartexa.com"],
 footer .footer-grid a[href="https://www.qartexa.com/"],
 footer .footer-grid a[href="http://www.qartexa.com"]{display:none!important}
+
+/* Professional editorial refinements: restrained section labels and consistent text-style arrows. */
+.kicker,
+.kicker > span,
+.eyebrow,
+.family-kicker,
+.phase82-families .family-kicker {
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  line-height: 1.45 !important;
+  letter-spacing: .035em !important;
+  text-transform: none !important;
+}
+.kicker,
+.kicker > span,
+.family-kicker,
+.phase82-families .family-kicker {
+  color: #536b82 !important;
+}
+.eyebrow {
+  color: inherit;
+  letter-spacing: .045em !important;
+}
+.eyebrow::before {
+  width: 20px !important;
+  height: 1px !important;
+}
+
+/* Keep arrow symbols typographic rather than emoji-styled on every screen. */
+html, body, a, button, .text-link, .link {
+  font-variant-emoji: text;
+}
+
+/* Give solution and industry hero photography a deliberate, less panoramic crop on phones. */
+.subhero .hero-art {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  border-radius: 12px;
+  filter: drop-shadow(0 16px 24px rgba(6, 38, 80, .14));
+}
+.subhero .hero-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 12px;
+}
+@media (max-width: 767px) {
+  .subhero .subhero-grid {
+    gap: 24px !important;
+  }
+  .subhero .hero-art {
+    width: 100% !important;
+    max-width: none !important;
+    max-height: 360px;
+  }
+  .subhero .hero-art img {
+    width: 100% !important;
+    height: clamp(220px, 70vw, 340px) !important;
+    aspect-ratio: 5 / 4 !important;
+    object-fit: cover !important;
+    object-position: center 45% !important;
+  }
+}
