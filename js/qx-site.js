@@ -18,7 +18,7 @@ const dyn=[];   // dynamic elements that must re-render when the language change
 function css(){
   if(document.getElementById('qx-site-css'))return;
   const s=document.createElement('style');s.id='qx-site-css';
-  s.textContent='.qx-noimg{display:block;aspect-ratio:1920/819;background:linear-gradient(135deg,#062650,#0b376d 60%,#e80000 160%)}.qx-gone{display:none!important}';
+  s.textContent='.qx-noimg{display:block;aspect-ratio:1920/819;background:linear-gradient(135deg,#062650,#0b376d 60%,#e80000 160%)}.qx-gone{display:none!important}.phase4-ecosystem[hidden],.phase4-ecosystem [hidden]{display:none!important}';
   document.head.appendChild(s);
 }
 const href=r=>r.is_core?B+'solutions/'+r.slug+'.html':B+'solution.html?s='+encodeURIComponent(r.slug);
@@ -130,12 +130,12 @@ async function applyPartners(){
     const live=new Set(rows.map(r=>String(r.logo_url||'').split('/').pop().toLowerCase()).filter(Boolean));
     root.querySelectorAll('.partner-logo img').forEach(img=>{
       const file=String(img.getAttribute('src')||'').split('/').pop().toLowerCase();
-      if(live.has(file))img.closest('.partner-logo').hidden=false;
-      else if(file)img.closest('.partner-logo').hidden=true;
+      if(live.has(file)){img.closest('.partner-logo').hidden=false;img.closest('.partner-logo').style.display='';}
+      else if(file){img.closest('.partner-logo').hidden=true;img.closest('.partner-logo').style.display='none';}
     });
     root.querySelectorAll('.partner-group').forEach(group=>{
       const logos=[...group.querySelectorAll('.partner-logo')];
-      if(logos.length&&logos.every(el=>el.hidden))group.hidden=true;
+      if(logos.length&&logos.every(el=>el.hidden)){group.hidden=true;group.style.display='none';}
     });
   }catch(e){/* Keep the existing static partner presentation if data cannot be read. */}
 }
